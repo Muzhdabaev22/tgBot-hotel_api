@@ -92,4 +92,5 @@ def image_function(message):  # в разработке
         bot.send_message(message.from_user.id, 'выводим..')
 
 
-bot.polling(none_stop=True)  # python diploma/bot.py
+if __name__ == '__main__':
+    bot.polling(none_stop=True)  # python diploma/bot.py
