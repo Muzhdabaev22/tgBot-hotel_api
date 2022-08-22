@@ -40,8 +40,8 @@ def lowprice_command(message):
 
 def low_price_hotels(message):
     data_hotels_in_city = locations_v2_search(message)  # получил данные отелей в городе
-    dict_for_sort = create_data_lowPrice(data_hotels_in_city)  # создал словарь
-    sorted_dict = sorted_lowPrice_hotel(dict_for_sort)  # отсортировал его
+    dict_for_sort = create_list_lowPrice(data_hotels_in_city)  # создал словарь
+    sorted_dict = sorted_lowPrice_list(dict_for_sort)  # отсортировал его
     bot.message_handler(message.from_user.id, f'Сколько вывести отелей? Максимум {len(sorted_dict)}')
     bot.register_next_step_handler(message, hotel_max, sorted_dict)
 
