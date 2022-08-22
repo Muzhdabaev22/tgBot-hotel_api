@@ -54,4 +54,4 @@ def hotel_max(message, *args):
 
 
 if __name__ == '__main__':
-    bot.polling(none_stop=True)  # python diploma/main.py
+    bot.polling(none_stop=True)  # python main.py
