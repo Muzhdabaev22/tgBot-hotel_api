@@ -50,7 +50,7 @@ def hotel_max(message, *args):
     hotel_maximum = message.text
     for i in range(0, hotel_maximum):
         hotel_name, hotel_price, hotel_id = *args[i][0], *args[i][1], *args[i][2]
-        bot.send_message(message.from_user.id, hotel_name, hotel_price)
+        bot.send_message(message.from_user.id, f"Название отеля: {hotel_name}, \nЦена: {hotel_price}")
 
 
 if __name__ == '__main__':

@@ -9,6 +9,9 @@ API_KEY = os.getenv("API_KEY")
 
 
 def locations_v2_search(city):
+    """
+    Получаем информацию о отелях в городе
+    """
     querystring = {"query": city}
     headers = {
         "X-RapidAPI-Key": API_KEY,
@@ -21,7 +24,9 @@ def locations_v2_search(city):
 
 
 def get_details_about_hotels(id_hotel):
-
+    """
+    Получение информации в виде списка [название, цена, id]
+    """
     url = "https://hotels4.p.rapidapi.com/properties/get-details"
 
     querystring = {"id": id_hotel}
@@ -35,16 +40,16 @@ def get_details_about_hotels(id_hotel):
 
     data_json = json.loads(url.text)
 
-    try:
-        name = data_json["data"]["body"]["propertyDescription"]["name"]
-        price = data_json["data"]["body"]["propertyDescription"]["featuredPrice"]["currentPrice"]["formatted"]
-        result = [name, price, id_hotel]
-    except Exception:
-        return None
+    name = data_json["data"]["body"]["propertyDescription"]["name"]
+    price = data_json["data"]["body"]["propertyDescription"]["featuredPrice"]["currentPrice"]["formatted"]
+    result = [name, price, id_hotel]
     return result
 
 
 def create_list_lowPrice(hotels_data_id):
+    """
+    Делает список из списков с отелями
+    """
     list_info_about_hotel = list()
     for i in range(len(hotels_data_id["suggestions"][1]["entities"])):
         if get_details_about_hotels(hotels_data_id["suggestions"][1]["entities"][i]["destinationId"]) is None:
@@ -56,6 +61,9 @@ def create_list_lowPrice(hotels_data_id):
 
 
 def sorted_lowPrice_list(dict_info):
+    """
+    Сортирует получаемый список по цене отеля.
+    """
     sorted_list = sorted(dict_info, key=lambda x: x[1])
     return sorted_list
 
