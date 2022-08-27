@@ -56,11 +56,14 @@ def hotel_max(message, sorted_list):
     Вывод названия и цены отеля, запрос о показе фотографий об отеле
     """
     hotel_maximum = message.text
-    for index in range(0, int(hotel_maximum)):
-        hotel_name, hotel_price, hotel_id = sorted_list[index][0], sorted_list[index][1], sorted_list[index][2]
-        kb = types.InlineKeyboardMarkup()
-        kb.add(types.InlineKeyboardButton('Получить фото', callback_data=f'hotel_{hotel_id}'))
-        bot.send_message(message.from_user.id, f'Название: {hotel_name}, \nЦена за ночь: {hotel_price}', reply_markup=kb)
+    try:
+        for index in range(0, int(hotel_maximum)):
+            hotel_name, hotel_price, hotel_id = sorted_list[index][0], sorted_list[index][1], sorted_list[index][2]
+            kb = types.InlineKeyboardMarkup()
+            kb.add(types.InlineKeyboardButton('Получить фото', callback_data=f'hotel_{hotel_id}'))
+            bot.send_message(message.from_user.id, f'Название: {hotel_name}, \nЦена за ночь: {hotel_price}', reply_markup=kb)
+    except Exception:
+        bot.send_message(message.from_user.id, 'Не правильный ввод количества вывода отелей')
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('hotel_'))
