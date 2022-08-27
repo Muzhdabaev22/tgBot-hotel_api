@@ -40,9 +40,14 @@ def get_details_about_hotels(id_hotel):
 
     data_json = json.loads(url.text)
 
-    name = data_json["data"]["body"]["propertyDescription"]["name"]
-    price = data_json["data"]["body"]["propertyDescription"]["featuredPrice"]["currentPrice"]["formatted"]
-    result = [name, price, id_hotel]
+    try:
+        name = data_json["data"]["body"]["propertyDescription"]["name"]
+        price = data_json["data"]["body"]["propertyDescription"]["featuredPrice"]["currentPrice"]["formatted"]
+        result = [name, price, id_hotel]
+    except Exception:
+        name = data_json["data"]["body"]["propertyDescription"]["name"]
+        price = "Информация отсутствует"
+        result = [name, price, id_hotel]
     return result
 
 
@@ -51,7 +56,7 @@ def create_list_lowPrice(hotels_data_id):
     Делает список из списков с отелями
     """
     list_info_about_hotel = list()
-    for i in range(len(hotels_data_id["suggestions"][1]["entities"])):
+    for i in range(0, len(hotels_data_id["suggestions"][1]["entities"])):
         if get_details_about_hotels(hotels_data_id["suggestions"][1]["entities"][i]["destinationId"]) is None:
             continue
         else:
@@ -67,3 +72,21 @@ def sorted_lowPrice_list(dict_info):
     sorted_list = sorted(dict_info, key=lambda x: x[1])
     return sorted_list
 
+
+def get_image(id_hotel):
+    """
+    Функция для получения фотографии
+    """
+    url = "https://hotels4.p.rapidapi.com/properties/get-hotel-photos"
+
+    querystring = {"id": id_hotel}
+
+    headers = {
+        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Host": "hotels4.p.rapidapi.com"
+    }
+
+    url = requests.get("https://hotels4.p.rapidapi.com/properties/get-hotel-photos", headers=headers, params=querystring)
+    data = json.loads(url.text)
+
+    return data["hotelImages"][0]["baseUrl"]
