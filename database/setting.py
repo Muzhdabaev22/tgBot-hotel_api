@@ -1,9 +1,7 @@
-import os
-from dotenv import load_dotenv
+import telebot
+from config_data.config import API_KEY, TOKEN
 
-
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
+bot = telebot.TeleBot(TOKEN)
 
 headers = {
         "X-RapidAPI-Key": API_KEY,

@@ -1,7 +1,7 @@
 import datetime
 import json
 import requests
-from setting import headers
+from database.setting import headers
 from bs4 import BeautifulSoup
 
 
