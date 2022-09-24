@@ -1,10 +1,10 @@
 import telebot
 import os
+from classes import class_history
 from dotenv import load_dotenv
 from telebot import types
 from utils import locations_v2_search, sorted_lowPrice_list, create_list, get_image, sorted_highPrice_list, \
-    search_for_suitablel_bestdeal
-
+    search_for_suitablel_bestdeal, get_time
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN_BOT")
@@ -16,6 +16,7 @@ def start(message):
     """
     Команда для начала работы бота
     """
+    class_history.setter_for_not_hotels(message.text, get_time())
     bot.send_message(message.from_user.id, 'Привет! Введи команду /help для просмотра списка команд')
 
 
@@ -24,6 +25,7 @@ def help_command(message):
     """
     Команда для вывода всех функций
     """
+    class_history.setter_for_not_hotels(message.text, get_time())
     bot.send_message(message.from_user.id, 'Список команд: \n'
                                            '● /lowprice — вывод самых дешёвых отелей в городе,\n'
                                            '● /highprice — вывод самых дорогих отелей в городе,\n'
@@ -32,11 +34,32 @@ def help_command(message):
                                            '● /history — вывод истории поиска отелей.')
 
 
+@bot.message_handler(commands=['history'])
+def history_command(message):
+    class_history.setter_for_not_hotels(message.text, get_time())
+    history_list = class_history.getter_history()
+    try:
+        for i_history in range(len(history_list)):
+            if len(history_list[i_history]) == 3:
+                command, time, hotels = history_list[i_history][0], history_list[i_history][1], history_list[i_history][
+                    2]
+                bot.send_message(message.from_user.id, f"Команда: {command},\n"
+                                                       f"Дата и время: {time}\n"
+                                                       f"Выведенные отели: {str(hotels)[1:-1]}")
+            else:
+                command, time = history_list[i_history][0], history_list[i_history][1]
+                bot.send_message(message.from_user.id, f"Команда: {command},\n"
+                                                       f"Дата и время: {time}\n")
+    except TypeError:
+        bot.send_message(message.from_user.id, "Ранее вы ничего не вводили")
+
+
 @bot.message_handler(commands=['lowprice'])
 def lowprice_command(message):
     """
     Команда для начала поиска самых дешёвых отелей
     """
+    class_history.setter_command_and_time(message.text, get_time())
     bot.send_message(message.from_user.id, 'Введите город')
     bot.register_next_step_handler(message, low_price_hotels)
 
@@ -46,6 +69,7 @@ def highprice_command(message):
     """
     Команда для начала поиска самых дорогих отелей
     """
+    class_history.setter_command_and_time(message.text, get_time())
     bot.send_message(message.from_user.id, 'Введите город')
     bot.register_next_step_handler(message, high_price_hotels)
 
@@ -55,6 +79,7 @@ def bestdeal_command(message):
     """
     Команда для начала поиска наиболее подходящих по цене и расположению от центра отеля
     """
+    class_history.setter_command_and_time(message.text, get_time())
     bot.send_message(message.from_user.id, 'Введите город')
     bot.register_next_step_handler(message, range_price)
 
@@ -95,7 +120,6 @@ def treatment_ranges(message, city, price):  # price в виде списка
         bot.send_message(message.from_user.id, 'Вы не правильно ввели диапазон. Пример: 2-5.9')
 
 
-
 def high_price_hotels(message):
     """
     Создание и сортировка списка с информацией об дорогих отелях
@@ -125,14 +149,21 @@ def hotel_max(message, sorted_list):
     hotel_maximum = message.text
     if hotel_maximum != 0:
         try:
+            hotels_list = list()
             for index in range(0, int(hotel_maximum)):
                 hotel_name, hotel_price, hotel_id = sorted_list[index][0], sorted_list[index][1], sorted_list[index][2]
+                hotels_list.append(hotel_name)
                 kb = types.InlineKeyboardMarkup()
                 kb.add(types.InlineKeyboardButton('Получить фото', callback_data=f'hotel_{hotel_id}'))
-                bot.send_message(message.from_user.id, f'Название: {hotel_name}, \nЦена за ночь: {hotel_price}', reply_markup=kb)
-        except Exception:
+                bot.send_message(message.from_user.id, f'Название: {hotel_name}, \nЦена за ночь: {hotel_price}',
+                                 reply_markup=kb)
+            class_history.setter_hotels(hotels_list)
+            class_history.setter_for_hotels()
+        except TypeError:
             bot.send_message(message.from_user.id, 'Похоже вы ввели не число. Пожалуйста, попробуйте снова.')
+            class_history.else_setter_for_hotels()
     else:
+        class_history.else_setter_for_hotels()
         bot.send_message(message.from_user.id, 'Нет результатов.')
 
 

@@ -1,3 +1,4 @@
+import datetime
 import json
 import requests
 from setting import headers
@@ -33,6 +34,8 @@ def get_details_about_hotels(id_hotel):
         name = data_json["data"]["body"]["propertyDescription"]["name"]
         price = "Информация отсутствует"
         result = [name, price, id_hotel]
+    except None:
+        return None
     return result
 
 
@@ -117,3 +120,9 @@ def search_for_suitablel_bestdeal(list_for_sort, price, distanse):
             ready_list.append(hotel_check(list_for_sort[i_hotel], price, distanse))
 
     return ready_list
+
+
+def get_time():
+    date = datetime.datetime.now()
+    correct_date = date.strftime("Дата: %d/%m/%Y время: %H:%M:%S")
+    return correct_date
