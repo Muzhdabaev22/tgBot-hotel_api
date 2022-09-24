@@ -1,3 +1,5 @@
+# для переноса в нормальный формат сдачи
+
 import datetime
 import json
 import requests

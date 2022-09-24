@@ -1,3 +1,6 @@
+# для переноса в нормальный формат сдачи
+
+
 import telebot
 import os
 from classes import class_history
@@ -178,3 +181,4 @@ def image(call):
 
 if __name__ == '__main__':
     bot.polling(none_stop=True)  # python main.py
+
