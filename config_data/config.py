@@ -9,9 +9,6 @@ else:
 
 TOKEN = os.getenv("TOKEN_BOT")
 API_KEY = os.getenv("API_KEY")
-DEFAULT_COMMANDS = (
-    ('start', "Запустить бота"),
-    ('help', "Вывести справку")
-)
+
 
 
