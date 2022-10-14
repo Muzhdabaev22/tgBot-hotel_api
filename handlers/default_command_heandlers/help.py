@@ -3,7 +3,7 @@ from database.classes import class_history
 from utils_directory.utils import get_time
 
 
-@bot.message_handler(commands=['help'])
+# @bot.message_handler(commands=['help'])
 def help_command(message):
     """
     Команда для вывода всех функций
@@ -15,3 +15,7 @@ def help_command(message):
                                            '● /bestdeal — вывод отелей, наиболее подходящих по цене и расположению '
                                            'от центра,\n '
                                            '● /history — вывод истории поиска отелей.')
+
+
+def register_handlers_help():
+    bot.register_message_handler(help_command, commands=["help"])

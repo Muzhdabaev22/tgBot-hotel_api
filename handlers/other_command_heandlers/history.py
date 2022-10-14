@@ -3,8 +3,8 @@ from database.classes import class_history
 from utils_directory.utils import get_time
 
 
-@bot.message_handler(commands=['history'])
-def history_command(message):
+# @bot.message_handler(commands=['history'])
+def history(message):
     class_history.setter_for_not_hotels(message.text, get_time())
     history_list = class_history.getter_history()
     try:
@@ -21,3 +21,7 @@ def history_command(message):
                                                        f"Дата и время: {time}\n")
     except TypeError:
         bot.send_message(message.from_user.id, "Ранее вы ничего не вводили")
+
+
+def register_heandler_history():
+    bot.register_message_handler(history, commands=["history"])

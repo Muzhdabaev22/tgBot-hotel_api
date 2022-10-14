@@ -3,13 +3,14 @@ import json
 import requests
 from database.setting import headers
 from bs4 import BeautifulSoup
+from database.setting import locale_setting
 
 
 def locations_v2_search(city):
     """
     Получаем информацию о отелях в городе
     """
-    querystring = {"query": city}
+    querystring = {"query": city, "locale": locale_setting}
     url = requests.get("https://hotels4.p.rapidapi.com/locations/v2/search/", headers=headers, params=querystring)
     data = json.loads(url.text)
 

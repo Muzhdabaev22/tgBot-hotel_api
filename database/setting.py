@@ -1,7 +1,9 @@
 import telebot
-from config_data.config import API_KEY, TOKEN
+from config import API_KEY, TOKEN
 
 bot = telebot.TeleBot(TOKEN)
+
+locale_setting = "en_EN"
 
 headers = {
         "X-RapidAPI-Key": API_KEY,

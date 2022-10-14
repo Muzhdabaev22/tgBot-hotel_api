@@ -5,12 +5,36 @@ from utils_directory.utils import locations_v2_search, create_list, sorted_lowPr
 from database.setting import bot
 
 
-def low_price_hotels(message):
+def low_price_hotels(message):  # <<<< ЗДЕСЬ ПРОБЛЕМКА
     """
-    Создание и сортировка списка с информацией об дешёвых отелях
+    Информация об месте где брать отели.
+    Если нет таких предложений, то брать отели из предложенного
     """
     data_hotels_in_city = locations_v2_search(message.text)  # получил данные отелей в городе
-    list_for_sort = create_list(data_hotels_in_city)  # создал список
+    if check_for_CITY_GROUP_api(data_hotels_in_city):  # проверка на наличие "city_group" в api
+        kb = types.InlineKeyboardMarkup(row_width=1)
+        for i_kb in range(len(data_hotels_in_city["suggestions"][0]["entities"])):
+            kb.add(types.InlineKeyboardButton(data_hotels_in_city["suggestions"][0]["entities"][i_kb]["name"],
+                                              callback_data=
+                                              f"city_group_{data_hotels_in_city['suggestions'][0]['entities'][i_kb]['name']}"))
+        bot.send_message(message.from_user.id, "Уточните место:", reply_markup=kb)
+    else:
+        bot.register_next_step_handler(message, for_continue_lowprice_without_CITYGROUP, data_hotels_in_city)
+
+
+def for_continue_lowprice_with_CITYGROUP(message, data):
+    """
+    Продолжение функции lowprice: создания и сортировки списка отелей
+    c city_group
+    """
+    # в процессе...
+
+def for_continue_lowprice_without_CITYGROUP(message, data):
+    """
+    Продолжение функции lowprice: создания и сортировки списка отелей
+    без city_group
+    """
+    list_for_sort = create_list(data)  # создал список
     sorted_list = sorted_lowPrice_list(list_for_sort)  # отсортировал его
     bot.send_message(message.from_user.id, f'Сколько вывести отелей? Максимум {len(sorted_list)}')
     bot.register_next_step_handler(message, hotel_max, sorted_list)
@@ -46,6 +70,13 @@ def range_distance(message, city):
         bot.register_next_step_handler(message, treatment_ranges, city, price)
     except TypeError:
         bot.send_message(message.from_user.id, 'Вы не правильно ввели цену. Пример: 200-300')
+
+
+def check_for_CITY_GROUP_api(data):
+    if data["suggestions"][0]["entities"] != 0:
+        return True
+    else:
+        return False
 
 
 def treatment_ranges(message, city, price):  # price в виде списка

@@ -1,0 +1,1 @@
+from handlers.other_command_heandlers import bestdeal, highprice, history, lowprice
