@@ -1,53 +1,77 @@
 import datetime
 import json
 import requests
+from telebot import types
+
 from database.setting import headers
 from bs4 import BeautifulSoup
-from database.setting import locale_setting
 
 
-def locations_v2_search(city):
+def locations_v2_search(city, locale):
     """
     Получаем информацию о отелях в городе
     """
-    querystring = {"query": city, "locale": locale_setting}
+    querystring = {"query": city, "locale": locale}
     url = requests.get("https://hotels4.p.rapidapi.com/locations/v2/search/", headers=headers, params=querystring)
     data = json.loads(url.text)
 
     return data
 
 
-def get_details_about_hotels(id_hotel):
-    """
-    Получение информации в виде списка [название, цена, id]
-    """
-    querystring = {"id": id_hotel}
+def properties_listLOW(place, locale):
+    querystring = {"destinationId": place, "pageNumber": "1", "pageSize": "25", "checkIn": "2023-11-19",
+                   "checkOut": "2023-11-22", "adults1": "1", "sortOrder": "PRICE", "locale": locale}
 
-    url = requests.get("https://hotels4.p.rapidapi.com/properties/get-details", headers=headers, params=querystring)
+    url = requests.get("https://hotels4.p.rapidapi.com/properties/list", headers=headers, params=querystring)
+    data_list = json.loads(url.text)
+    return data_list
 
-    data_json = json.loads(url.text)
 
+def properties_listHIGH(place, locale):
+    querystring = {"destinationId": place, "pageNumber": "1", "pageSize": "25", "checkIn": "2023-11-19",
+                   "checkOut": "2023-11-22", "adults1": "1", "sortOrder": "PRICE_HIGHEST_FIRST", "locale": locale}
+
+    url = requests.get("https://hotels4.p.rapidapi.com/properties/list", headers=headers, params=querystring)
+    data_list = json.loads(url.text)
+    return data_list
+
+
+def get_details_about_hotels_with_CITYGROUP(data_hotels, level):
     try:
-        name = data_json["data"]["body"]["propertyDescription"]["name"]
-        price = data_json["data"]["body"]["propertyDescription"]["featuredPrice"]["currentPrice"]["formatted"]
-        result = [name, price, id_hotel]
+        name = data_hotels["data"]["body"]["searchResults"]["results"][level]["name"]
+        price = data_hotels["data"]["body"]["searchResults"]["results"][level]["ratePlan"]["price"]["current"]
+        id_hotel = data_hotels["data"]["body"]["searchResults"]["results"][level]["id"]
+        address = data_hotels["data"]["body"]["searchResults"]["results"][level]["address"]["streetAddress"]
+        result = [name, price, id_hotel, address]
+        return result
     except Exception:
-        name = data_json["data"]["body"]["propertyDescription"]["name"]
-        price = "Информация отсутствует"
-        result = [name, price, id_hotel]
-    except None:
         return None
-    return result
 
 
-def create_list(hotels_data_id):
+def create_list_without_CITYGROUP(hotels_data_id):
     """
     Делает список из списков с отелями
     """
     list_info_about_hotel = list()
     for i in range(0, len(hotels_data_id["suggestions"][1]["entities"])):
-        list_info_about_hotel.append(get_details_about_hotels(
-            hotels_data_id["suggestions"][1]["entities"][i]["destinationId"]))
+        name = hotels_data_id["suggestions"][1]["entities"][i]["name"]
+        list_info_about_hotel.append(name)
+    return list_info_about_hotel
+
+
+def create_list_with_CITYGROUP_low(place, locale):
+    hotels_data = properties_listLOW(place, locale)
+    list_info_about_hotel = list()
+    for i in range(0, len(hotels_data["data"]["body"]["searchResults"]["results"])):
+        list_info_about_hotel.append(get_details_about_hotels_with_CITYGROUP(hotels_data, i))
+    return list_info_about_hotel
+
+
+def create_list_with_CITYGROUP_high(place, locale):
+    hotels_data = properties_listHIGH(place, locale)
+    list_info_about_hotel = list()
+    for i in range(0, len(hotels_data["data"]["body"]["searchResults"]["results"])):
+        list_info_about_hotel.append(get_details_about_hotels_with_CITYGROUP(hotels_data, i))
     return list_info_about_hotel
 
 
@@ -67,7 +91,7 @@ def sorted_highPrice_list(list_info):
     return sorted_list
 
 
-def get_image(id_hotel):
+def get_image_photo(id_hotel):
     """
     Функция для получения фотографии
     """
@@ -76,51 +100,12 @@ def get_image(id_hotel):
     url = requests.get("https://hotels4.p.rapidapi.com/properties/get-hotel-photos", headers=headers, params=querystring)
     data = json.loads(url.text)
 
-    return data["hotelImages"][0]["baseUrl"]
+    media_list = list()
+    for i_elem in range(5):
+        media_list.append(types.InputMediaPhoto(data["hotelImages"][i_elem]["baseUrl"].format(size="z")))
+    return media_list
 
-
-def parsing_for_distance(id_hotel):
-    """
-    Парсинг/получение информации о расстоянии с сайта
-    """
-    r = requests.get(f'https://www.hotels.com/ho{id_hotel}')
-    soup = BeautifulSoup(r.text, 'html.parser')
-    list_soup = soup.find('ul', class_="_2sHYiJ").find_all('li')
-    text = list_soup[-1].text
-    return text.split(' ')[-2]
-
-
-def hotel_check(list_with_data, price, distance_user):
-    """
-    Проверка отеля по требованиям пользователя
-    """
-    distance = parsing_for_distance(list_with_data[2]).replace(',', '.')
-    try:
-        if float(distance_user[0]) < float(distance) < float(distance_user[1]):
-            if int(price[0]) < int(list_with_data[1].split('$')[-1]) < int(price[1]):
-                return list_with_data
-            elif list_with_data[1] == 'Информация отсутствует':
-                return list_with_data
-            else:
-                return None
-        else:
-            return None
-    except Exception:
-        return None
-
-
-def search_for_suitablel_bestdeal(list_for_sort, price, distanse):
-    """
-    Добавление в список подходящих отелей по цене и расстоянию до центра
-    """
-    ready_list = list()
-    for i_hotel in range(len(list_for_sort)):
-        if hotel_check(list_for_sort[i_hotel], price, distanse) is None:
-            continue
-        else:
-            ready_list.append(hotel_check(list_for_sort[i_hotel], price, distanse))
-
-    return ready_list
+# distance = parsing_for_distance(list_with_data[2]).replace(',', '.')
 
 
 def get_time():

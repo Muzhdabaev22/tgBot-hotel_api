@@ -3,7 +3,6 @@ from database.classes import class_history
 from utils_directory.utils import get_time
 
 
-# @bot.message_handler(commands=['history'])
 def history(message):
     class_history.setter_for_not_hotels(message.text, get_time())
     history_list = class_history.getter_history()
