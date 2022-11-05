@@ -239,7 +239,7 @@ def hotel_max_with_CITYGROUP(message, sorted_list, answer_hotel):
                                                              sorted_list[index][2], sorted_list[index][3]
                 hotels_list.append(hotel_name)
                 bot.send_message(message.from_user.id, f'Название: {hotel_name}, '
-                                                       f'\nЦена за ночь: {hotel_price}, '
+                                                       f'\nЦена за ночь: {hotel_price}$, '
                                                        f'\nАдрес: {address}, '
                                                        f'\nБольше информации на сайте: '
                                                        f'https://www.hotels.com/ho{hotel_id}')
@@ -250,7 +250,7 @@ def hotel_max_with_CITYGROUP(message, sorted_list, answer_hotel):
                 bot.send_media_group(message.chat.id, get_image_photo(hotel_id))
                 hotels_list.append(hotel_name)
                 bot.send_message(message.from_user.id, f'Название: {hotel_name}, '
-                                                       f'\nЦена за ночь: {hotel_price}, '
+                                                       f'\nЦена за ночь: {hotel_price}$, '
                                                        f'\nАдрес: {address}, '
                                                        f'\nБольше информации на сайте: '
                                                        f'https://www.hotels.com/ho{hotel_id}')
@@ -277,7 +277,7 @@ def hotel_max_bestdeal(message, sorted_list, answer):
                                                              sorted_list[index][4]
                 hotels_list.append(hotel_name)
                 bot.send_message(message.from_user.id, f'Название: {hotel_name}, '
-                                                       f'\nЦена за ночь: {hotel_price}, '
+                                                       f'\nЦена за ночь: {hotel_price}$, '
                                                        f'\nРасстояние до центра: {distance}, '
                                                        f'\nАдрес: {address}, '
                                                        f'\nБольше информации на сайте: '
@@ -290,7 +290,7 @@ def hotel_max_bestdeal(message, sorted_list, answer):
                 bot.send_media_group(message.chat.id, get_image_photo(hotel_id))
                 hotels_list.append(hotel_name)
                 bot.send_message(message.from_user.id, f'Название: {hotel_name}, '
-                                                       f'\nЦена за ночь: {hotel_price}, '
+                                                       f'\nЦена за ночь: {hotel_price}$, '
                                                        f'\nРасстояние до центра: {distance}, '
                                                        f'\nАдрес: {address}, '
                                                        f'\nБольше информации на сайте: '
