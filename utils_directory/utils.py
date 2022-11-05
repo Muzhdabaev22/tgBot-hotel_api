@@ -2,14 +2,12 @@ import datetime
 import json
 import requests
 from telebot import types
-
 from database.setting import headers
-from bs4 import BeautifulSoup
 
 
 def locations_v2_search(city, locale):
     """
-    Получаем информацию о отелях в городе
+    Получаем информацию об отелях в городе
     """
     querystring = {"query": city, "locale": locale}
     url = requests.get("https://hotels4.p.rapidapi.com/locations/v2/search/", headers=headers, params=querystring)
@@ -34,6 +32,38 @@ def properties_listHIGH(place, locale):
     url = requests.get("https://hotels4.p.rapidapi.com/properties/list", headers=headers, params=querystring)
     data_list = json.loads(url.text)
     return data_list
+
+
+def properties_listBESTDEAL(place, locale, price):
+    querystring = {"destinationId": place, "pageNumber": "1", "pageSize": "25", "checkIn": "2022-11-19",
+                   "checkOut": "2022-11-22", "adults1": "1", "priceMin": price[0], "priceMax": price[1],
+                   "sortOrder": "PRICE", "locale": locale, "currency": "USD"}
+
+    url = requests.get("https://hotels4.p.rapidapi.com/properties/list", headers=headers, params=querystring)
+    data_list = json.loads(url.text)
+    return data_list
+
+
+def checking_suitable(place, locale, price, distance):
+    data = properties_listBESTDEAL(place, locale, price)
+    list_hotel = list()
+    if len(data["data"]["body"]["searchResults"]["results"]) != 0:
+        for i_elem in range(len(data["data"]["body"]["searchResults"]["results"])):
+            distance_hotel = data["data"]["body"]["searchResults"]["results"][i_elem]["landmarks"][0]["distance"]
+            if distance[0] <= distance_hotel <= distance[1]:
+                list_hotel.append(add_in_list_bestdeal(data, i_elem, distance_hotel))
+        return list_hotel
+    else:
+        return list_hotel
+
+
+def add_in_list_bestdeal(data, level, distance):
+    name = data["data"]["body"]["searchResults"]["results"][level]["name"]
+    price = data["data"]["body"]["searchResults"]["results"][level]["ratePlan"]["price"]["current"]
+    id_hotel = data["data"]["body"]["searchResults"]["results"][level]["id"]
+    address = data["data"]["body"]["searchResults"]["results"][level]["address"]["streetAddress"]
+    result = [name, price, id_hotel, address, distance]
+    return result
 
 
 def get_details_about_hotels_with_CITYGROUP(data_hotels, level):
@@ -97,15 +127,17 @@ def get_image_photo(id_hotel):
     """
     querystring = {"id": id_hotel}
 
-    url = requests.get("https://hotels4.p.rapidapi.com/properties/get-hotel-photos", headers=headers, params=querystring)
+    url = requests.get("https://hotels4.p.rapidapi.com/properties/get-hotel-photos", headers=headers,
+                       params=querystring)
     data = json.loads(url.text)
 
     media_list = list()
-    for i_elem in range(5):
-        media_list.append(types.InputMediaPhoto(data["hotelImages"][i_elem]["baseUrl"].format(size="z")))
+    media_list.append(types.InputMediaPhoto(data["hotelImages"][0]["baseUrl"].format(size="z")))
+    media_list.append(types.InputMediaPhoto(data["hotelImages"][1]["baseUrl"].format(size="z")))
+    media_list.append(types.InputMediaPhoto(data["hotelImages"][2]["baseUrl"].format(size="z")))
+    media_list.append(types.InputMediaPhoto(data["hotelImages"][3]["baseUrl"].format(size="z")))
+    media_list.append(types.InputMediaPhoto(data["hotelImages"][4]["baseUrl"].format(size="z")))
     return media_list
-
-# distance = parsing_for_distance(list_with_data[2]).replace(',', '.')
 
 
 def get_time():

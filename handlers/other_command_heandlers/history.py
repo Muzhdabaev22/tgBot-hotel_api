@@ -1,9 +1,14 @@
 from database.setting import bot
 from database.classes import class_history
 from utils_directory.utils import get_time
+from database.logging import logger
 
 
 def history(message):
+    """
+    Команда, делающая историю пользователя
+    """
+    logger.info(f'Функция {history.__name__} вызвана с параметром: {message}')
     class_history.setter_for_not_hotels(message.text, get_time())
     history_list = class_history.getter_history()
     try:

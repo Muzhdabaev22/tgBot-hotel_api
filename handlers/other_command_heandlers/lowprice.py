@@ -2,12 +2,15 @@ from telebot import types
 from database.setting import bot
 from database.classes import class_history
 from utils_directory.utils import get_time
+from database.logging import logger
 
 
 def lowprice(message):
     """
     Команда для начала поиска самых дешёвых отелей
     """
+    logger.info(f'Функция {lowprice.__name__} вызвана с параметром: {message}')
+
     class_history.setter_command_and_time(message.text, get_time())
     kb = types.InlineKeyboardMarkup(row_width=2)
     kb.add(types.InlineKeyboardButton('en_EN', callback_data='locate_low_en_EN'))

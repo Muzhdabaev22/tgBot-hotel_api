@@ -10,7 +10,7 @@ def locate_low_price(call):
                               reply_markup=None)
         bot.register_next_step_handler(call.message, low_price_hotel, "en_EN")
 
-    elif call.data == "locate_low_en_EN":
+    elif call.data == "locate_low_ru_RU":
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                               text="Место действия установлено: ru_RU. Теперь введите город, где хотите найти отель.",
                               reply_markup=None)
@@ -24,7 +24,7 @@ def locate_high_price(call):
                               reply_markup=None)
         bot.register_next_step_handler(call.message, high_price_hotels, "en_EN")
 
-    elif call.data == "locate_high_en_EN":
+    elif call.data == "locate_high_ru_RU":
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                               text="Место действия установлено: ru_RU. Теперь введите город, где хотите найти отель.",
                               reply_markup=None)
@@ -38,7 +38,7 @@ def locate_bestdeal(call):
                               reply_markup=None)
         bot.register_next_step_handler(call.message, best_deal_hotel, "en_EN")
 
-    elif call.data == "locate_best_en_EN":
+    elif call.data == "locate_best_ru_RU":
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                               text="Место действия установлено: ru_RU. Теперь введите город, где хотите найти отель.",
                               reply_markup=None)
