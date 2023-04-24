@@ -26,7 +26,7 @@ logger.add("info.log", format="{time} | {level} | {message}", level="DEBUG", rot
 * /highprice - топ дорогих отелей
 * /bestdeal - лучшие предложения
 
-## Как работаь с ботом
+## Как работать с ботом
 
 ### Топ дешевых отелей
    1. Введите команду /lowprice. Бот запросит место действия.
